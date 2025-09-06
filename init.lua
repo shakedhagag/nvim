@@ -109,7 +109,10 @@ vim.o.mouse = 'a'
 
 -- Don't show the mode, since it's already in the status line
 vim.o.showmode = false
-
+vim.o.tabstop = 2 -- Number of spaces a tab counts for
+vim.o.shiftwidth = 2 -- Number of spaces for each indent level
+vim.o.softtabstop = 2 -- Number of spaces a tab counts for while editing
+vim.o.expandtab = true -- Use spaces instead of tabs
 -- Sync clipboard between OS and Neovim.
 --  Schedule the setting after `UiEnter` because it can increase startup-time.
 --  Remove this option if you want your OS clipboard to remain independent.
@@ -184,6 +187,30 @@ vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagn
 -- or just use <C-\><C-n> to exit terminal mode
 vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 
+local keymap = vim.keymap -- for conciseness
+local opts = { noremap = true, silent = true }
+
+-- Do things without affecting the registers
+keymap.set('n', 'x', '"_x')
+keymap.set('n', '<Leader>p', '"0p')
+keymap.set('n', '<Leader>P', '"0P')
+keymap.set('v', '<Leader>p', '"0p')
+keymap.set('n', '<Leader>c', '"_c')
+keymap.set('n', '<Leader>C', '"_C')
+keymap.set('v', '<Leader>c', '"_c')
+keymap.set('v', '<Leader>C', '"_C')
+keymap.set('n', '<Leader>d', '"_d')
+keymap.set('n', '<Leader>D', '"_D')
+keymap.set('v', '<Leader>d', '"_d')
+keymap.set('v', '<Leader>D', '"_D')
+
+-- Select all
+keymap.set('n', '<C-a>', 'gg<S-v>G')
+
+-- Split window
+keymap.set('n', 'ss', ':split<Return>', opts)
+keymap.set('n', 'sv', ':vsplit<Return>', opts)
+
 -- TIP: Disable arrow keys in normal mode
 -- vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
 -- vim.keymap.set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
@@ -193,11 +220,24 @@ vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' }
 -- Keybinds to make split navigation easier.
 --  Use CTRL+<hjkl> to switch between windows
 --
---  See `:help wincmd` for a list of all window commands
+
 vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
 vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
 vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
+vim.keymap.set('n', 's', '<Nop>', { desc = 'Disable substitute' })
+
+vim.keymap.set('n', '<S-l>', '$', { desc = 'Go to the end of a line' })
+vim.keymap.set('n', '<S-h>', '^', { desc = 'Go to the start of a line' })
+
+-- Jump between diagnostics
+-- Hyper+\ for next diagnostic
+vim.keymap.set('n', '<D-C-A-S-\\>', function()
+  local next_diagnostic = vim.diagnostic.get_next()
+  if next_diagnostic then
+    vim.api.nvim_win_set_cursor(0, { next_diagnostic.lnum + 1, next_diagnostic.col })
+  end
+end, { desc = 'Go to next diagnostic' })
 
 -- NOTE: Some terminals have colliding keymaps or are not able to send distinct keycodes
 -- vim.keymap.set("n", "<C-S-h>", "<C-w>H", { desc = "Move window to the left" })
