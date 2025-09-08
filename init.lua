@@ -211,6 +211,17 @@ keymap.set('n', '<C-a>', 'gg<S-v>G')
 keymap.set('n', 'ss', ':split<Return>', opts)
 keymap.set('n', 'sv', ':vsplit<Return>', opts)
 
+-- Move current line up and down
+keymap.set('n', '<A-k>', '<cmd>call utils#SwitchLine(line("."), "up")<cr>', { desc = 'move line up' })
+keymap.set('n', '<A-j>', '<cmd>call utils#SwitchLine(line("."), "down")<cr>', { desc = 'move line down' })
+
+-- Move current visual-line selection up and down
+keymap.set('x', '<A-k>', '<cmd>call utils#MoveSelection("up")<cr>', { desc = 'move selection up' })
+
+keymap.set('x', '<A-j>', '<cmd>call utils#MoveSelection("down")<cr>', { desc = 'move selection down' })
+
+keymap.set('n', '<leader>=', '<C-w>=', { desc = 'Equal Panes' }) -- save file
+
 -- TIP: Disable arrow keys in normal mode
 -- vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
 -- vim.keymap.set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
@@ -925,11 +936,11 @@ require('lazy').setup({
     -- change the command in the config to whatever the name of that colorscheme is.
     --
     -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
-    'folke/tokyonight.nvim',
+    'tiagovla/tokyodark.nvim',
     priority = 1000, -- Make sure to load this before all the other start plugins.
     config = function()
       ---@diagnostic disable-next-line: missing-fields
-      require('tokyonight').setup {
+      require('tokyodark').setup {
         styles = {
           comments = { italic = true }, -- Disable italics in comments
         },
@@ -938,7 +949,7 @@ require('lazy').setup({
       -- Load the colorscheme here.
       -- Like many other themes, this one has different styles, and you could load
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'solarized-osaka'
+      vim.cmd.colorscheme 'tokyodark'
     end,
   },
 
