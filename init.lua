@@ -458,11 +458,22 @@ require('lazy').setup({
         -- You can put your default mappings / updates / etc. in here
         --  All the info you're looking for is in `:help telescope.setup()`
         --
-        -- defaults = {
-        --   mappings = {
-        --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
-        --   },
-        -- },
+        defaults = {
+          file_ignore_patterns = { 'node_modules', '.git/' }, -- Keep ignoring these
+          hidden = true, -- This enables searching hidden files
+          -- OR use vimgrep_arguments to customize ripgrep behavior
+          vimgrep_arguments = {
+            'rg',
+            '--color=never',
+            '--no-heading',
+            '--with-filename',
+            '--line-number',
+            '--column',
+            '--smart-case',
+            '--hidden', -- Add this flag
+            '--glob=!.git/*', -- Exclude .git directory
+          },
+        },
         -- pickers = {}
         extensions = {
           ['ui-select'] = {
