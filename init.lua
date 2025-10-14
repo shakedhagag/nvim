@@ -474,7 +474,13 @@ require('lazy').setup({
             '--glob=!.git/*', -- Exclude .git directory
           },
         },
-        -- pickers = {}
+        pickers = {
+          find_files = {
+            -- `hidden = true` will still show the inside of hidden files.
+            -- To not show hidden files, set `hidden = false`
+            hidden = true,
+          },
+        },
         extensions = {
           ['ui-select'] = {
             require('telescope.themes').get_dropdown(),
@@ -491,6 +497,63 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
       vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
       vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
+      -- Search ALL files including gitignored and hidden
+      vim.keymap.set('n', '<leader>sF', function()
+        require('telescope.builtin').find_files {
+          hidden = true,
+          no_ignore = true,
+          no_ignore_parent = true,
+          file_ignore_patterns = {
+            -- Directories that are large and slow down search
+            'node_modules/',
+            '.git/',
+            '.pnpm%-store/',
+            '.turbo/',
+            '.next/',
+            'dist/',
+            'out/',
+            'build/',
+            'coverage/',
+            '.terraform/',
+            '.vercel/',
+            '.react%-email/',
+            '.claude/',
+            '.cursor/',
+
+            -- Data directories
+            'redis_data/',
+            'postgres_data/',
+            'docs/',
+            'tests/server_tests/docs/',
+            'templates/',
+
+            -- Test results and reports
+            'frame%-sre/test%-results/',
+            'frame%-sre/playwright%-report/',
+            'frame%-sre/logs/',
+            'frame%-sre/screenshots/',
+            'frame%-sre/storage/',
+
+            -- Lock files (large and not useful to search)
+            'package%-lock%.json',
+            'pnpm%-lock%.yaml',
+            '%.terraform%.lock%.hcl',
+
+            -- Binary and compiled files
+            '%.exe',
+            '%.dll',
+            '%.so',
+            '%.dylib',
+            '%.tfstate',
+            '%.log',
+
+            -- Terraform files
+            '%.tf',
+            '%.tfvars',
+          },
+        }
+      end, { desc = '[S]earch [F]iles (including gitignored)' })
+
       vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
       vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
       vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
@@ -617,6 +680,13 @@ require('lazy').setup({
               jump_type = 'vsplit',
             }
           end, '[G]oto Implementation in [V]ertical Split')
+
+          -- Jump to implementation in horizontal split
+          map('grh', function()
+            vim.cmd 'split'
+            require('telescope.builtin').lsp_implementations()
+          end, '[G]oto Implementation in [H]orizontal Split')
+
           -- Jump to the definition of the word under your cursor.
           --  This is where a variable was first declared, or where a function is defined, etc.
           --  To jump back, press <C-t>.
