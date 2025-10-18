@@ -2,10 +2,13 @@ return {
   {
     'zbirenbaum/copilot.lua',
     event = 'VeryLazy',
+    dependencies = {
+      'copilotlsp-nvim/copilot-lsp',
+    },
     config = function()
       require('copilot').setup {
         suggestion = {
-          enabled = true,
+          enabled = false,
           auto_trigger = true,
           accept = false,
         },
@@ -19,6 +22,14 @@ return {
           javascript = true,
           typescript = true,
           ['*'] = true,
+        },
+        nes = {
+          enabled = true,
+          keymap = {
+            accept_and_goto = '<leader>p',
+            accept = false,
+            dismiss = '<Esc>',
+          },
         },
       }
 
