@@ -670,7 +670,6 @@ require('lazy').setup({
           },
         },
       }
-
       -- Ensure the servers and tools above are installed
       --
       -- To check the current status of installed tools and/or manually install
@@ -1105,5 +1104,45 @@ require('oil').setup {
   },
 }
 
+-- Disable syntax for large files
+vim.api.nvim_create_autocmd('BufReadPost', {
+  callback = function()
+    local file_size = vim.fn.getfsize(vim.fn.expand '%')
+    if file_size > 1024 * 1024 then -- 1MB
+      vim.opt_local.syntax = 'off'
+      vim.opt_local.filetype = ''
+      vim.opt_local.undolevels = -1
+    end
+  end,
+})
+
+-- Optimize treesitter for performance
+require('nvim-treesitter.configs').setup {
+  highlight = {
+    enable = true,
+    disable = function(lang, buf)
+      local max_filesize = 100 * 1024 -- 100 KB
+      local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
+      if ok and stats and stats.size > max_filesize then
+        return true
+      end
+    end,
+  },
+}
+
+-- After the mason-lspconfig setup, add direct Tailwind configuration
+vim.lspconfig.tailwindcss.setup {
+  capabilities = capabilities,
+  root_dir = function(fname)
+    return vim.fs.dirname(vim.fs.find('.git', { path = fname, upward = true })[1])
+  end,
+  settings = {
+    tailwindCSS = {
+      experimental = {
+        configFile = 'frontend/packages/ui/src/styles/globals.css',
+      },
+    },
+  },
+}
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
